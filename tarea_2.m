@@ -29,23 +29,6 @@ by = 1-my*maxPrice;
 
 Y = my*Yo + by;
 
-# Select the grid to plot the contours and gradients
-th0=-1:0.05:0;
-th1=-0.2:0.05:1.4;
-th2=-0.4:0.05:0.4;
-% [tt0,tt1,tt2] = meshgrid(th0,th1,th2);
-% theta=[tt0(:) tt1(:), tt2(:)];
-
-
-# Objective function of the parameters theta, requires also the data A
-# First create a matrix without the square, where the j-column has
-# theta_0 + theta_1*x_1^(j)-y^(j).  Then, square all elements of that matrix
-# and finally add up all elements in each row
-function res=J(theta,X,Y)
-  D=(X*theta'-Y*ones(1,rows(theta)));
-  res=0.5*sum(D.*D,1)';
-endfunction;
-
 # Gradient of J.
 # Analytical solution.
 #
@@ -68,30 +51,70 @@ t1 = -0.2;
 t2 = -0.3;
  
 
-# Perform the gradient descent
+# Perform the gradient descent (batch)
 ts=t; # sequence of t's
 
 for i=[1:100] # max 100 iterations
   tc = ts(rows(ts),:); # Current position 
   gn = gradJ(tc,X,Y);  # Gradient at current position
   tn = tc - alpha * gn;# Next position
-  ts = [ts;tn]
+  ts = [ts;tn];
 
 
   if (norm(tc-tn)<0.001) break; endif;
 endfor
 
+# Perform the gradient descent (stochastic)
+tss=t; # sequence of t's
+
+j=0;
+for i=[1:4000] # max 100 iterations
+  tcs = tss(rows(tss),:); # Current position
+  sample=round(unifrnd(1,rows(X))); # Use one random sample
+  gns = gradJ(tcs,X(sample,:),Y(sample));  # Gradient at current position
+  tns = tcs - alpha * gns;# Next position
+  tss = [tss;tns];
+
+  if (norm(tcs-tns)<0.0001)
+    j=j+1;
+    if (j>5)
+      break;
+    endif;
+  else
+    j=0;
+  endif;
+endfor
+
 
 figure(1);
-#plot3(ts(:,1),ts(:,2),ts(:,3),"k-");
+plot3(ts(:,1),ts(:,2),ts(:,3),"k-");
+hold on;
+plot3([t0],[t1],[t2],"*r");
 plot3(ts(:,1),ts(:,2),ts(:,3),"ob");
-   #plot3([t0],[t1],[t2],"*g");
-box on
+box on;
 
-while(1)
+title("Batch");
+xlabel("theta_0");
+ylabel("theta_1");
+zlabel("theta_2");
+xlim([-1 0]);
+ylim([-0.2 1.4]);
+zlim([-0.4 0.4]);
 
- xlabel("theta_0");
- ylabel("theta_1");
- zlabel("theta_2");
- 
-endwhile;
+figure(2);
+plot3(tss(:,1),tss(:,2),tss(:,3),"k-");
+hold on;
+plot3(tss(:,1),tss(:,2),tss(:,3),"ob");
+plot3([t0],[t1],[t2],"*r");
+
+
+box on;
+
+title("Stochastic");
+xlabel("theta_0");
+ylabel("theta_1");
+zlabel("theta_2");
+xlim([-1 0]);
+ylim([-0.2 1.4]);
+zlim([-0.4 0.4]);
+
