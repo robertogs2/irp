@@ -8,7 +8,10 @@
 
 Instrucciones para ejecutar el script:
 
-1. Ejecutar desde terminal el comando:
+1. Ejecutar desde terminal los comandos:
+	
+	(opcional si ya cuenta con el paquete)
+	$ apt install octave-optim
 	
 	$ octave --persist gradient_descent.m
 
@@ -16,7 +19,7 @@ Nota: Es importante que se ejecute la GUI de Octave, ya que el paquete de qt uti
 para la interfaz gráfica de la tarea no está disponible a través de la línea de comandos de Octave.
 
 2. Una vez que se abra la Figura 1, deberá seleccionar por medio de las barras deslizables los valores 
-para el punto de inicio del algoritmo, o si lo desea dejar los valores que están seleccionados por defecto.
+para el punto de inicio del algoritmo, o si lo desea, dejar los valores que están seleccionados por defecto.
 
 3. Para iniciar la ejecución del algoritmo, debe hacer click en el botón "Calculate Gradient".
 

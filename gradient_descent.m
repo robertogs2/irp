@@ -83,6 +83,7 @@ function gradientDescent(obj)
   y = round(10 * get(h.y_slider, "value")) /10;
   z = round(10 * get(h.z_slider, "value")) /10;
   
+  #Initial point
   t = [x y z];
   alpha = 0.01;
   
@@ -339,7 +340,7 @@ h.x_slider = uicontrol ("style", "slider",
                             "value", -1,
                             "min", -1,
                             "max", 0,
-                            "sliderstep", [0.1 0.1],
+                            "sliderstep", [0.1 0.1],                      
                             "callback", @updateLabels,
                             "position", [0.3 0.65 0.4 0.06]);
 
