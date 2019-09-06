@@ -1,9 +1,17 @@
+#############################################
+###            DATA LOADING               ###
+#############################################
+
 load quasar_train.csv;
 lambdas = quasar_train(1, :)';
 train_qso = quasar_train(2:end, :);
 load quasar_test.csv;
 test_qso = quasar_test(2:end, :);
 
+
+#############################################
+###            LINEAR REGRESSION          ###
+#############################################
 
 Xo = [ones(rows(lambdas),1),lambdas];
 Yo = train_qso(1,:)';
@@ -29,72 +37,78 @@ Y = my*Yo + by;
 imy = 1/my;
 iby = -by/my;
 
+# Normal equation
 theta = pinv(X)*Y;
 
-figure(1);
+figure(1, "name", "Linear regression");
 hold off;
 plot(Xo(:,2),Yo,"*b");
 hold on;
 
-# The line back in the samples
-lambda_plot=lambdas;%linspace(min(Xo(:,2)),max(Xo(:,2)),5);
-
 # We have to de-normalize the normalized estimation
-lums=theta(2)*imy*mx*lambda_plot + (imy*theta(2)*bx + imy*theta(1)+iby);
-plot(lambda_plot,lums,'k',"linewidth",3);
+lums=theta(2)*imy*mx*lambdas + (imy*theta(2)*bx + imy*theta(1)+iby);
+plot(lambdas,lums,'k',"linewidth",3);
+title("Linear regression");
+legend({'Raw data','Linear Regression'});
+xlabel('\lambda');
+ylabel('Flux');
 
+#############################################
+###     LOCALLY WEIGHTED REGRESSION       ###
+#############################################
 
+figure(2, "name", "Locally weighted regression");
+
+hold off;
+plot(Xo(:,2),Yo,"*b");
+hold on;
+
+colors = ["r", "b", "g", "m", "c"]; 
 tau = [1, 5, 10, 100, 1000];
-exponent_tau = 1/(tau(2)^2);
+exponent_tau = 1./(tau.^2);
+num_tests = size(lambdas);
 
-%raw
-xio = lambdas;
-
-# Normalize also the output
-minlambda=min(xio);
-maxlambda=max(xio);
+# Normalize the lambdas
+minlambda=min(lambdas);
+maxlambda=max(lambdas);
 my = 2/(maxlambda-minlambda);
 by = 1-my*maxlambda;
 
-xi = my*xio + by;
-
-num_tests = 450;
-
-%lambdas raw
-test_lambdaso = lambdas';
-
 %lambdas normalized
-test_lambdasi = my*test_lambdaso + by;
+normalized_lambdas = my*lambdas' + by;
+%constant part of the exponent
+exponent = e.^(-(((lambdas' - lambdas).^2)./(2)));
 
-% for (i=[1:size(tau)])
+for (j=[1:columns(tau)])
 
-% endfor
+  %weights
+  wi = exponent.^(exponent_tau(j));
 
-exponent = e.^(-(((test_lambdaso - xio).^2)./(2)));
+  %Initialize results normalized
+  lums_normalized = zeros(1,num_tests);
 
-wi = exponent.^(exponent_tau);
+  for i=[1:num_tests]
 
-% W = diag(wi(:,1)); 
+    %Diagonal matrix with weights
+    W = diag(wi(:,i)); 
 
-% THETA = inv(X'*W*X) * X'*W*Y;
+    %Demonstrated equation
+    THETA = inv(X'*W*X) * X'*W*Y;
 
-yi = zeros(1,num_tests);
+    lums_normalized(i) = THETA'*[1; normalized_lambdas(i)];
 
-for i=[1:num_tests]
+  endfor
 
-  W = diag(wi(:,i)); 
-
-  THETA = inv(X'*W*X) * X'*W*Y;
-
-  yi(i) = THETA'*[1; test_lambdasi(i)];
+  lums=imy*lums_normalized + iby;
+  plot(lambdas, lums, colors(j), "linewidth", 3);
 
 endfor
-yi;
-lumsi=imy*yi + iby;
+title("Locally weighted regression");
+legend({'Raw data','\tau=1','\tau=5', '\tau=10', '\tau=100', '\tau=1000'});
+xlabel('\lambda');
+ylabel('Flux');
 
-figure(2)
 
-hold off;
-plot(Xo(:,2),Yo,"*b");
-hold on;
-plot(test_lambdaso, lumsi, "r", "linewidth", 3);
+
+
+
