@@ -43,9 +43,9 @@ from sklearn.model_selection import train_test_split
 X_train, X_test, y_train, y_test = train_test_split(X_data, Y, test_size=0.15, random_state=42)
 
 # Create a classifier: a support vector classifier
-max_iterations = 100
+max_iterations = 50
 kernel_svm = svm.SVC(gamma=.2, max_iter=max_iterations, verbose= True)
-linear_svm = svm.LinearSVC(max_iter=max_iterations, verbose= True)
+linear_svm = svm.LinearSVC(max_iter=10000, verbose= True)
 
 # create pipeline from kernel approximation
 # and linear svm
@@ -53,10 +53,10 @@ feature_map_fourier = RBFSampler(gamma=.2, random_state=1)
 feature_map_nystroem = Nystroem(gamma=.2, random_state=1)
 
 fourier_approx_svm = pipeline.Pipeline([("feature_map", feature_map_fourier),
-                                        ("svm", svm.LinearSVC())])
+                                        ("svm", svm.LinearSVC())], verbose=True)
 
 nystroem_approx_svm = pipeline.Pipeline([("feature_map", feature_map_nystroem),
-                                        ("svm", svm.LinearSVC())])
+                                        ("svm", svm.LinearSVC())], verbose=True)
 
 # fit and predict using linear and kernel svm:
 
@@ -89,7 +89,7 @@ nystroem_scores = []
 fourier_times = []
 nystroem_times = []
 
-
+print ('Fitting the kernel pipelines')
 for D in sample_sizes:
     fourier_approx_svm.set_params(feature_map__n_components=D)
     nystroem_approx_svm.set_params(feature_map__n_components=D)
@@ -105,6 +105,7 @@ for D in sample_sizes:
     nystroem_score = nystroem_approx_svm.score(X_test, y_test)
     nystroem_scores.append(nystroem_score)
     fourier_scores.append(fourier_score)
+print ('Fitting the kernel pipelines done')
 
 # plot the results:
 plt.figure(figsize=(8, 8))

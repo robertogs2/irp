@@ -14,6 +14,7 @@ from sklearn import datasets, svm, metrics
 #fetch original mnist dataset
 from sklearn.datasets import fetch_mldata
 
+# To store model
 from sklearn.externals import joblib
 # import custom module
 from mnist_helpers import *
@@ -52,7 +53,7 @@ Y = targets
 #from sklearn.cross_validation import train_test_split
 from sklearn.model_selection import train_test_split
 X_train, X_test, y_train, y_test = train_test_split(X_data, Y, test_size=0.15, random_state=42)
-
+print(X_train[0])
 
 ################ Classifier with good params ###########
 # Create a classifier: a support vector classifier
