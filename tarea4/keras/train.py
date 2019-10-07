@@ -30,6 +30,8 @@ model = Sequential([
   #Input shape for network
   Dense(64, activation='relu', input_shape=(784,)),
   Dense(64, activation='relu'),
+  Dense(64, activation='relu'),
+  Dense(64, activation='relu'),
   Dense(10, activation='softmax')
   ])
 
@@ -51,7 +53,7 @@ model.fit(
   #Y data encoded as canonic vector
   to_categorical(train_labels),
   #Iterations for the whole data set
-  epochs=100,
+  epochs=150,
   #Samples per gradient update
   batch_size=64,
   #Validation fraction from training data

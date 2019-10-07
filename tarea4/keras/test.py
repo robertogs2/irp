@@ -21,6 +21,8 @@ model = Sequential([
   #Input shape for network
   Dense(64, activation='relu', input_shape=(784,)),
   Dense(64, activation='relu'),
+  Dense(64, activation='relu'),
+  Dense(64, activation='relu'),
   Dense(10, activation='softmax')
   ])
 
@@ -28,7 +30,7 @@ model = Sequential([
 model.load_weights('Models/model.h5')
 
 #Predict
-predictions = model.predict(test_images)
+predictions = model.predict(test_images[:1])
 #Vector with winner class for each image
 max_predictions = np.argmax(predictions, axis=1)
 
