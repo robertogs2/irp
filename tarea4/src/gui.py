@@ -88,7 +88,7 @@ class App:
   def load_model(self):
     #Keras mode
     if(self.mode_var.get() == 1):
-      self.classifier_path = filedialog.askopenfilename(initialdir = "../Keras_Models/",title = "Select classifier model",filetypes = (("model files","*.h5"),("all files","*.*")))
+      self.classifier_path = filedialog.askopenfilename(initialdir = "../Keras_Models/",title = "Select classifier model",filetypes = (("model files","*_5.h5"),("all files","*.*")))
       #If selected a model
       try:  
         #Model building
