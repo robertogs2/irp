@@ -7,6 +7,7 @@ from sklearn.metrics import classification_report, confusion_matrix
 from mnist_helpers import *
 
 #Load test data
+print("Loading dataset...")
 test_images = mnist.test_images()
 test_labels = mnist.test_labels()
 
@@ -27,10 +28,10 @@ model = Sequential([
   ])
 
 #Model loading
-model.load_weights('Models/model.h5')
+model.load_weights('../Keras_Models/Experimento_1_lr_0.001_5.h5')
 
 #Predict
-predictions = model.predict(test_images[:1])
+predictions = model.predict(test_images)
 #Vector with winner class for each image
 max_predictions = np.argmax(predictions, axis=1)
 
