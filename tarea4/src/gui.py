@@ -39,6 +39,7 @@ class App:
     self.drawing_canvas = Canvas(self.root, bg = "white", width=self.canvas_size, height=self.canvas_size)
     self.drawing_canvas.grid(row=0, column=0)
     self.drawing_canvas.bind("<B1-Motion>", self.paint_rectangle)
+    self.drawing_canvas.bind("<B3-Motion>", self.erase_rectangle)
 
     self.bottom_canvas=Canvas(self.root,width=self.canvas_size,height=200)
     self.bottom_canvas.grid(row=1, column=0)
@@ -81,6 +82,11 @@ class App:
     x1,y1=(event.x-self.pixel_scaled/2),(event.y-self.pixel_scaled/2)
     x2,y2=(event.x+self.pixel_scaled/2),(event.y+self.pixel_scaled/2)
     self.drawing_canvas.create_rectangle(x1,y1,x2,y2,fill="black")
+
+  def erase_rectangle(self,event):
+    x1,y1=(event.x-self.pixel_scaled/2),(event.y-self.pixel_scaled/2)
+    x2,y2=(event.x+self.pixel_scaled/2),(event.y+self.pixel_scaled/2)
+    self.drawing_canvas.create_rectangle(x1,y1,x2,y2,fill="white",outline='white')
 
   def clean_rectangles(self):
     self.drawing_canvas.delete(ALL)

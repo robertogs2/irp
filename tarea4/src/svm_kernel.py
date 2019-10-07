@@ -10,16 +10,25 @@ from sklearn.datasets import fetch_mldata 	# Fetch original mnist database
 import joblib
 from sklearn.utils import shuffle			# To shuffle vectors
 from mnist_helpers import * 				# import custom module
+import mnist
 
 import sys
 import argparse
 
 def load_images_targets():
-	mnist = fetch_mldata('MNIST original', data_home='./') 	# it creates mldata folder in your root project folder
-	mnist.keys() 											# Check for correct keys data, COL_NAMES, DESCR, target fields
-	images = mnist.data 									# Data field is 70k x 784 array, each row represents pixels from 28x28=784 image
-	targets = mnist.target
-	return images, targets
+	train_images = mnist.train_images()
+	train_labels = mnist.train_labels()
+	test_images = mnist.test_images()
+	test_labels = mnist.test_labels()
+
+	train_images = train_images.reshape((-1, 784))
+	test_images = test_images.reshape((-1, 784))
+
+	images = np.concatenate((train_images, test_images),axis=0)
+	targets = np.concatenate((train_labels,test_labels),axis=0)
+
+	return images,targets
+
 
 def split_data(images, targets, param_test_size=10000/70000, param_random_state=42):
 	X_data = images/255.0 									#Normalize the data
@@ -30,6 +39,7 @@ def split_data(images, targets, param_test_size=10000/70000, param_random_state=
 	#Now shuffle that data
 	X_train, y_train = shuffle(X_train, y_train, random_state=0)
 	X_test, y_test = shuffle(X_test, y_test, random_state=0)
+	
 	return X_train, X_test, y_train, y_test
 
 def train_new_svm(param_C=5, param_max_iterations=100, param_kernel='rbf', param_gamma=0.05, param_degree=3, param_coef0 = 0.0, param_verbose=False):
@@ -58,12 +68,12 @@ def train_new_svm(param_C=5, param_max_iterations=100, param_kernel='rbf', param
 def save_model(model, path, name):
 	# Stores the model
 	joblib.dump(model, path + name + '.sav')
+	print('Model saved to: ' + path + name + '.sav')
 
 def load_model(filepath):
 	return joblib.load(filepath)
 
 def test_model(classifier, X_test, y_test):
-	print(X_test[0])
 	expected = y_test
 	predicted = classifier.predict(X_test)
 
@@ -108,28 +118,29 @@ if __name__ == "__main__":
 	X_train, X_test, y_train, y_test = split_data(images, targets)
 	if not args.test:
 		verbose=False
-		metrics=False
+		metrics_active=False
 		kernel = 'rbf'
 		max_iterations = 2
 		C = 5
-		gamma = 0.05
+		gamma = 'scale'
 		degree=3
 		bcoef = 0.0
 		
 
-		kernels_avaliable = ['rbf']
+		kernels_avaliable = ['rbf', 'linear', 'sigmoid', 'poly']
 		## Verbose process
 		if args.verbose:
 			verbose = True
 		if args.metrics:
-			metrics = True
+			metrics_active = True
 		## Kernel Process
 		if args.kernel:
 			kernel = args.kernel
 			if kernel not in kernels_avaliable:
-				print('Kernel' + str(kernel) + 'not in kernels list')
+				print('Kernel' + str(kernel) + 'not in kernels list, using default')
 				print('Avaliable kernels are:')
 				print(kernels_avaliable)
+				kernel = 'rbf'
 		else:
 			print('Using default kernel ' + str(kernel))
 		if args.max_iterations:
@@ -154,7 +165,7 @@ if __name__ == "__main__":
 			print('Using default bcoef ' + str(bcoef))
 
 		#pick  random indexes from 0 to size of our dataset
-		if metrics:
+		if metrics_active:
 			show_some_digits(images,targets)
 
 		# ############### Classifier with good params ###########
@@ -163,14 +174,14 @@ if __name__ == "__main__":
 									param_degree=degree, param_coef0 = bcoef, 
 									param_verbose=verbose)
 
-		save_model(myclassifier, './models/', get_model_name(param_C=C, param_max_iterations=max_iterations, 
+		save_model(myclassifier, '../SVM_Models/', get_model_name(param_C=C, param_max_iterations=max_iterations, 
 															param_kernel=kernel, param_gamma=gamma, 
 															param_degree=degree, param_coef0 = bcoef))
 	else:
-		metrics = True
+		metrics_active = True
 		myclassifier = load_model(args.test)
 	# ########################################################
 	# # Now predict the value of the test
 
-	if metrics:
+	if metrics_active:
 		test_model(myclassifier, X_test, y_test)
