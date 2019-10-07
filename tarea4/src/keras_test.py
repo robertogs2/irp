@@ -20,15 +20,15 @@ test_images = test_images.reshape((-1, 784))
 #Model building
 model = Sequential([
   #Input shape for network
-  Dense(64, activation='sigmoid', input_shape=(784,)),
+  Dense(64, activation='relu', input_shape=(784,)),
   Dense(64, activation='relu'),
-  Dense(64, activation='sigmoid'),
+  Dense(64, activation='relu'),
   Dense(64, activation='relu'),
   Dense(10, activation='softmax')
   ])
 
 #Model loading
-model.load_weights('../Keras_Models/model.h5')
+model.load_weights('../Keras_Models/Experimento_1_lr_0.001_5.h5')
 
 #Predict
 predictions = model.predict(test_images)

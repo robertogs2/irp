@@ -2,7 +2,9 @@
 # Standard scientific Python imports
 import matplotlib.pyplot as plt
 from matplotlib.colors import Normalize
+import seaborn as sns
 import numpy as np
+import pandas as pd
 
 def show_some_digits(images, targets, sample_size=24, title_text='Digit {}' ):
     '''
@@ -30,11 +32,12 @@ def plot_confusion_matrix(cm, title='Confusion matrix', cmap=plt.get_cmap('jet')
     
     cm - confusion matrix
     """
-    plt.figure(1, figsize=(5, 4), dpi=160)
-    plt.imshow(cm, interpolation='nearest', cmap=cmap)
+    index = ['0','1','2','3','4','5','6','7','8','9']
+    cm_df = pd.DataFrame(cm, index, index)
+
+    plt.figure(1)
+    sns.heatmap(cm_df, annot=True, cmap=cmap, fmt="d")
     plt.title(title)
-    plt.colorbar()
-    plt.tight_layout()
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
 
