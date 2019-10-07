@@ -10,6 +10,7 @@ from keras.optimizers import Adam
 
 #Load train and test data
 
+print("Loading dataset...")
 train_images = mnist.train_images()
 train_labels = mnist.train_labels()
 test_images = mnist.test_images()
@@ -28,9 +29,9 @@ test_images = test_images.reshape((-1, 784))
 #Model building
 model = Sequential([
   #Input shape for network
-  Dense(64, activation='relu', input_shape=(784,)),
+  Dense(64, activation='sigmoid', input_shape=(784,)),
   Dense(64, activation='relu'),
-  Dense(64, activation='relu'),
+  Dense(64, activation='sigmoid'),
   Dense(64, activation='relu'),
   Dense(10, activation='softmax')
   ])
@@ -67,4 +68,4 @@ loss, accuracy = model.evaluate(
 print("Loss: " + str(loss) + "\nAccuracy: " + str(accuracy))
 
 #Model saving
-model.save_weights('Models/model.h5')
+model.save_weights('../Keras_Models/model.h5')

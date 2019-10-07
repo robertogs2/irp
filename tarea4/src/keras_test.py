@@ -7,6 +7,7 @@ from sklearn.metrics import classification_report, confusion_matrix
 from mnist_helpers import *
 
 #Load test data
+print("Loading dataset...")
 test_images = mnist.test_images()
 test_labels = mnist.test_labels()
 
@@ -19,18 +20,18 @@ test_images = test_images.reshape((-1, 784))
 #Model building
 model = Sequential([
   #Input shape for network
-  Dense(64, activation='relu', input_shape=(784,)),
+  Dense(64, activation='sigmoid', input_shape=(784,)),
   Dense(64, activation='relu'),
-  Dense(64, activation='relu'),
+  Dense(64, activation='sigmoid'),
   Dense(64, activation='relu'),
   Dense(10, activation='softmax')
   ])
 
 #Model loading
-model.load_weights('Models/model.h5')
+model.load_weights('../Keras_Models/model.h5')
 
 #Predict
-predictions = model.predict(test_images[:1])
+predictions = model.predict(test_images)
 #Vector with winner class for each image
 max_predictions = np.argmax(predictions, axis=1)
 
