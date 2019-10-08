@@ -124,7 +124,7 @@ class App:
         self.model = joblib.load(self.classifier_path)
         self.classifier_path_var.set(self.classifier_path.split("/")[-1])
 
-        print("Loaded classifier" + self.classifier_path)
+        print("Loaded classifier: " + self.classifier_path)
       except:
         pass
 
@@ -147,7 +147,8 @@ class App:
         y = self.model.predict([im])
         self.prediction_var.set('Prediction: ' + str(y[0]))
         print('Prediction: ' + str(y[0]))
-
+        if(self.model.probability):
+          print(self.model.predict_proba([fv]))
       else:
         messagebox.showerror("Model error", "Load a .h5 model for Keras mode or a .sav model for SVM mode")
     else:

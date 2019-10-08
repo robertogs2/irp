@@ -3,3 +3,9 @@ pandas
 seaborn
 pillow
 pyscreenshot
+scikit-learn
+sklearn 
+joblib
+mnist
+keras
+tensorflow

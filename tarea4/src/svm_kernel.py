@@ -42,7 +42,7 @@ def split_data(images, targets, param_test_size=10000/70000, param_random_state=
 	
 	return X_train, X_test, y_train, y_test
 
-def train_new_svm(param_C=5, param_max_iterations=100, param_kernel='rbf', param_gamma=0.05, param_degree=3, param_coef0 = 0.0, param_verbose=False):
+def train_new_svm(param_C=5, param_max_iterations=100, param_kernel='rbf', param_gamma=0.05, param_degree=3, param_coef0 = 0.0, param_verbose=False,param_proba=False):
 	# Create a classifier: a support vector classifier
 
 	classifier = svm.SVC(C=param_C,
@@ -51,7 +51,8 @@ def train_new_svm(param_C=5, param_max_iterations=100, param_kernel='rbf', param
 						max_iter=param_max_iterations, 
 						kernel=param_kernel, 
 						coef0=param_coef0, 
-						degree=param_degree)
+						degree=param_degree,
+						probability=param_proba)
 
 	# Training
 	start_time = dt.datetime.now()
@@ -67,7 +68,7 @@ def train_new_svm(param_C=5, param_max_iterations=100, param_kernel='rbf', param
 
 def save_model(model, path, name):
 	# Stores the model
-	joblib.dump(model, path + name + '.sav')
+	joblib.dump(model, path + name + '.sav', compress=9)
 	print('Model saved to: ' + path + name + '.sav')
 
 def load_model(filepath):
@@ -88,19 +89,19 @@ def test_model(classifier, X_test, y_test):
 
 	print("Accuracy={}".format(metrics.accuracy_score(expected, predicted)))
 
-def get_model_name(param_C=0, param_max_iterations=0, param_kernel=0, param_gamma=0, param_degree=0, param_coef0=0):
-	return 'model_iter:'\
+def get_model_name(param_C=0, param_max_iterations=0, param_kernel=0, param_gamma=0, param_degree=0, param_coef0=0,param_proba=False):
+	return 'model_maxiter:'\
 			+str(param_max_iterations)\
 			+'_gamma:'+str(param_gamma)\
 			+'_C:'+str(param_C)\
 			+'_kernel:'+str(param_kernel)\
 			+'_degree:'+str(param_degree)\
 			+'_bcoef:'+str(param_coef0)\
+			+'_proba:'+str(param_proba)\
 			+'_'+str(time.time()) \
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
-	#parser.add_argument("-h", "--help", action='store_true', help="print help")
 	parser.add_argument("-v", "--verbose", action='store_true', help="set verbose")
 	parser.add_argument("-k", "--kernel", help="set kernel")
 	parser.add_argument("-c", "--cparam", type=float, help='Set soft margin parameter C, '
@@ -108,8 +109,9 @@ if __name__ == "__main__":
 	parser.add_argument("-i", "--max_iterations", type=int, help="set maximun iterations")
 	parser.add_argument("-g", "--gamma", type=float, help="set gamma")
 	parser.add_argument("-d", "--degree", type=float, help="set degree")
-	parser.add_argument("-b", "--bcoef", type=float, help="set coefficient b")
+	parser.add_argument("-r", "--rcoef", type=float, help="set coefficient r for kernel")
 	parser.add_argument("-m", "--metrics", action='store_true', help="show metrics")
+	parser.add_argument("-p", "--proba", action='store_true', help="show metrics")
 	parser.add_argument("-t", "--test", help="tests a model")
 	args = parser.parse_args()
 
@@ -120,11 +122,12 @@ if __name__ == "__main__":
 		verbose=False
 		metrics_active=False
 		kernel = 'rbf'
+		proba = False
 		max_iterations = 2
 		C = 5
 		gamma = 'scale'
 		degree=3
-		bcoef = 0.0
+		rcoef = 0.0
 		
 
 		kernels_avaliable = ['rbf', 'linear', 'sigmoid', 'poly']
@@ -133,6 +136,8 @@ if __name__ == "__main__":
 			verbose = True
 		if args.metrics:
 			metrics_active = True
+		if args.proba:
+			proba = True
 		## Kernel Process
 		if args.kernel:
 			kernel = args.kernel
@@ -159,10 +164,10 @@ if __name__ == "__main__":
 			degree = args.degree
 		else:
 			print('Using default degree ' + str(degree))
-		if args.bcoef:
-			bcoef = args.bcoef
+		if args.rcoef:
+			rcoef = args.rcoef
 		else:
-			print('Using default bcoef ' + str(bcoef))
+			print('Using default rcoef ' + str(rcoef))
 
 		#pick  random indexes from 0 to size of our dataset
 		if metrics_active:
@@ -171,12 +176,13 @@ if __name__ == "__main__":
 		# ############### Classifier with good params ###########
 		myclassifier = train_new_svm(param_C=C, param_max_iterations=max_iterations, 
 									param_kernel=kernel, param_gamma=gamma, 
-									param_degree=degree, param_coef0 = bcoef, 
-									param_verbose=verbose)
+									param_degree=degree, param_coef0 = rcoef, 
+									param_verbose=verbose, param_proba=proba)
 
 		save_model(myclassifier, '../SVM_Models/', get_model_name(param_C=C, param_max_iterations=max_iterations, 
 															param_kernel=kernel, param_gamma=gamma, 
-															param_degree=degree, param_coef0 = bcoef))
+															param_degree=degree, param_coef0 = rcoef,
+															param_proba=proba))
 	else:
 		metrics_active = True
 		myclassifier = load_model(args.test)
