@@ -28,7 +28,7 @@ model = Sequential([
   ])
 
 #Model loading
-model.load_weights('../Keras_Models/Experimento_1_lr_0.001_5.h5')
+model.load_weights('../Keras_Models/Experimento_4_layers_rrrr_5.h5')
 
 #Predict
 predictions = model.predict(test_images)
@@ -41,4 +41,4 @@ report = classification_report(test_labels, max_predictions)
 print("CONFUSION MATRIX\n" + str(matrix))
 print("\nCLASSIFICATION REPORT\n" + str(report))
 
-plot_confusion_matrix(matrix)
+plot_confusion_matrix(matrix, title="Confusion matrix")
